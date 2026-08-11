@@ -1,0 +1,7 @@
+# Default owners for everything in the repository, unless a later match
+# takes precedence. Replace with your actual team/usernames.
+* @jhu-sheridan-libraries/REPLACE-WITH-TEAM
+
+# Example of scoping ownership more narrowly:
+# /docs/                @jhu-sheridan-libraries/REPLACE-WITH-DOCS-TEAM
+# /.github/workflows/    @jhu-sheridan-libraries/REPLACE-WITH-PLATFORM-TEAM

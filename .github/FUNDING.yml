@@ -1,0 +1,13 @@
+# Configures GitHub's "Sponsor" button for this repository.
+# This is for ongoing financial support of the project itself (GitHub
+# Sponsors, Open Collective, a lab donation page) -- it is NOT where you
+# cite grant funding that supported the work. Grant numbers and funder
+# acknowledgments belong in ACKNOWLEDGMENTS.md and CITATION.cff/.zenodo.json.
+# See docs/archiving-and-citability.md.
+#
+# Uncomment and fill in whichever platforms apply, or delete this file if
+# the project has no funding/sponsorship mechanism.
+
+# github: [REPLACE-WITH-GITHUB-USERNAME]
+# open_collective: REPLACE-WITH-OPEN-COLLECTIVE-SLUG
+# custom: ["https://REPLACE-WITH-LAB-OR-PROJECT-DONATION-PAGE"]
