@@ -1,0 +1,242 @@
+name: Release template
+
+# Creates a published source release for the template itself. GitHub's Zenodo
+# integration archives the published release and mints a version DOI; it does
+# not publish any of the independent language examples under examples/.
+#
+# Before dispatching, merge a release-preparation commit to the default branch
+# that updates CITATION.cff, .zenodo.json, and ro-crate-metadata.json for the
+# version being released. This workflow validates those committed records but
+# never changes them, keeping release metadata reviewable.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag in SemVer form (for example: v0.1.0 or v0.1.0-rc.1)."
+        required: true
+        type: string
+      prerelease:
+        description: "Mark this GitHub release as a prerelease. Must match whether the version has a SemVer prerelease suffix."
+        required: true
+        default: false
+        type: boolean
+      confirm:
+        description: "Type RELEASE to create the immutable Git tag and published GitHub release."
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: template-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Validate and publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Confirm release is from the default branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          DISPATCH_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          expected_ref="refs/heads/${DEFAULT_BRANCH}"
+          if [[ "${DISPATCH_REF}" != "${expected_ref}" ]]; then
+            echo "::error::Run this workflow from ${expected_ref}, not ${DISPATCH_REF}." >&2
+            exit 1
+          fi
+
+      - name: Validate release inputs
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+          PRERELEASE: ${{ inputs.prerelease }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM}" != "RELEASE" ]]; then
+            echo "::error::Set the confirm input to RELEASE to publish a release." >&2
+            exit 1
+          fi
+
+          semver_pattern='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$'
+          prerelease_pattern='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-'
+          if [[ ! "${VERSION}" =~ ${semver_pattern} ]]; then
+            echo "::error::version must be vMAJOR.MINOR.PATCH with optional SemVer prerelease/build metadata." >&2
+            exit 1
+          fi
+
+          if [[ "${VERSION}" =~ ${prerelease_pattern} ]]; then
+            version_is_prerelease=true
+          else
+            version_is_prerelease=false
+          fi
+          if [[ "${PRERELEASE}" != "${version_is_prerelease}" ]]; then
+            echo "::error::prerelease=${PRERELEASE} must match whether ${VERSION} has a prerelease suffix." >&2
+            exit 1
+          fi
+
+      - name: Checkout release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require successful CI for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          successful_run_id="$(gh run list \
+            --workflow ci.yml \
+            --commit "${TARGET_SHA}" \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')"
+          if [[ -z "${successful_run_id}" || "${successful_run_id}" == "null" ]]; then
+            echo "::error::No successful ci.yml run was found for ${TARGET_SHA}. Wait for CI, then retry." >&2
+            exit 1
+          fi
+          echo "Validated successful CI run ${successful_run_id} for ${TARGET_SHA}." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate release metadata
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import datetime
+          import json
+          import re
+          import sys
+          from pathlib import Path
+
+          version = __import__("os").environ["VERSION"]
+          expected_version = version.removeprefix("v")
+          errors: list[str] = []
+
+          cff_path = Path("CITATION.cff")
+          cff = cff_path.read_text(encoding="utf-8")
+          if "REPLACE-WITH-" in cff:
+              errors.append("CITATION.cff still contains a REPLACE-WITH placeholder")
+
+          def cff_value(field: str) -> str | None:
+              match = re.search(rf"^{re.escape(field)}:\s*[\"']?([^\"'\n]+)[\"']?\s*$", cff, re.MULTILINE)
+              return match.group(1).strip() if match else None
+
+          if cff_value("license") != "MIT":
+              errors.append("CITATION.cff license must be MIT")
+          if cff_value("version") != expected_version:
+              errors.append(f"CITATION.cff version must be {expected_version}")
+          release_date = cff_value("date-released")
+          try:
+              if release_date is None:
+                  raise ValueError("missing")
+              datetime.date.fromisoformat(release_date)
+          except ValueError:
+              errors.append("CITATION.cff date-released must be an ISO-8601 date")
+
+          def read_json(path: str) -> object:
+              try:
+                  return json.loads(Path(path).read_text(encoding="utf-8"))
+              except (OSError, json.JSONDecodeError) as exc:
+                  errors.append(f"{path} is not valid JSON: {exc}")
+                  return {}
+
+          zenodo = read_json(".zenodo.json")
+          ro_crate = read_json("ro-crate-metadata.json")
+
+          def strings(value: object):
+              if isinstance(value, str):
+                  yield value
+              elif isinstance(value, list):
+                  for item in value:
+                      yield from strings(item)
+              elif isinstance(value, dict):
+                  for item in value.values():
+                      yield from strings(item)
+
+          for path, metadata in ((".zenodo.json", zenodo), ("ro-crate-metadata.json", ro_crate)):
+              if any("REPLACE-WITH-" in value for value in strings(metadata)):
+                  errors.append(f"{path} still contains a REPLACE-WITH placeholder")
+
+          def license_values(value: object):
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      if key.lower() == "license" and isinstance(item, str):
+                          yield item
+                      yield from license_values(item)
+              elif isinstance(value, list):
+                  for item in value:
+                      yield from license_values(item)
+
+          accepted_licenses = {
+              "MIT",
+              "https://spdx.org/licenses/MIT",
+              "https://spdx.org/licenses/MIT.html",
+              "https://opensource.org/license/mit/",
+          }
+          for path, metadata in ((".zenodo.json", zenodo), ("ro-crate-metadata.json", ro_crate)):
+              values = list(license_values(metadata))
+              if not values or any(value not in accepted_licenses for value in values):
+                  errors.append(f"{path} license metadata must consistently identify the MIT License")
+
+          if errors:
+              print("::error::Release metadata preflight failed:", file=sys.stderr)
+              for error in errors:
+                  print(f"::error::{error}", file=sys.stderr)
+              raise SystemExit(1)
+          PYTHON
+
+      - name: Verify tag and release do not already exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if git ls-remote --tags --refs origin "refs/tags/${VERSION}" | grep -q .; then
+            echo "::error::Tag ${VERSION} already exists." >&2
+            exit 1
+          fi
+          if gh release view "${VERSION}" >/dev/null 2>&1; then
+            echo "::error::GitHub release ${VERSION} already exists." >&2
+            exit 1
+          fi
+
+      - name: Create published GitHub release
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PRERELEASE: ${{ inputs.prerelease }}
+          TARGET_SHA: ${{ github.sha }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          args=("${VERSION}" --target "${TARGET_SHA}" --title "${VERSION}" --generate-notes)
+          if [[ "${PRERELEASE}" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          release_url="$(gh release create "${args[@]}")"
+          echo "url=${release_url}" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Template release published"
+            echo
+            echo "- Tag: \`${VERSION}\`"
+            echo "- Commit: \`${TARGET_SHA}\`"
+            echo "- Release: ${release_url}"
+            echo
+            echo "Zenodo will archive this published release asynchronously. After it mints"
+            echo "the DOI, follow docs/archiving-and-citability.md to update the citation"
+            echo "records and README DOI badge in a separate reviewed commit."
+          } >> "$GITHUB_STEP_SUMMARY"

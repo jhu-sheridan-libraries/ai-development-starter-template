@@ -10,6 +10,29 @@ project details (title, authors, license) change.
 | [`.zenodo.json`](../.zenodo.json) | Zenodo, when this repository is connected to it | Overrides/supplements the metadata Zenodo would otherwise infer when minting a DOI for a release |
 | [`ro-crate-metadata.json`](../ro-crate-metadata.json) | RO-Crate-aware tooling, some institutional repositories | Structured, machine-readable research object description ([RO-Crate 1.1 spec](https://www.researchobject.org/ro-crate/specification/1.1/)) |
 
+## Releasing this template
+
+Use the **Release template** workflow (Actions → Release template → Run
+workflow) to create a published, source-only GitHub release for this template.
+It creates the tag and release together at the selected default-branch commit;
+it does not publish the independent Python, TypeScript, or Rust examples.
+
+1. Make a reviewed release-preparation commit on the default branch. Replace
+   all `REPLACE-WITH-...` values and keep `CITATION.cff`, `.zenodo.json`, and
+   `ro-crate-metadata.json` consistent with the actual repository title,
+   authors, and MIT license. Set `CITATION.cff`'s `version` to the intended
+   version *without* its leading `v` and give `date-released` a real ISO date.
+2. Wait for the `CI` workflow to pass for that commit, then run **Release
+   template** from the default branch. Supply a SemVer tag such as `v0.1.0`,
+   set **prerelease** only when the tag has a prerelease suffix (for example,
+   `v0.1.0-rc.1`), and type `RELEASE` in the confirmation field.
+3. The workflow verifies the branch, confirmation, SemVer/prerelease match,
+   successful CI run, release metadata, and absence of an existing tag or
+   release. It then uses GitHub-generated release notes to publish the release
+   and create the tag at that exact commit.
+4. After Zenodo has processed the published release, complete the DOI updates
+   described in [Getting a DOI via Zenodo](#getting-a-doi-via-zenodo) below.
+
 ## Getting a DOI via Zenodo
 
 [Zenodo](https://zenodo.org/) mints a permanent DOI for a snapshot of this

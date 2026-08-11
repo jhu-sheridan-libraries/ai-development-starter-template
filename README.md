@@ -1,15 +1,15 @@
 # libraries-ai-starter
 
 [![CI](https://github.com/jhu-sheridan-libraries/libraries-ai-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/jhu-sheridan-libraries/libraries-ai-starter/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-REPLACE--ME-lightgrey)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![DOI](https://img.shields.io/badge/DOI-pending--first--release-lightgrey)](./docs/archiving-and-citability.md)
 [![Cite this repository](https://img.shields.io/badge/cite-CITATION.cff-blue)](./CITATION.cff)
 
-> **Badge setup:** the CI badge assumes this repository lives at
-> `jhu-sheridan-libraries/libraries-ai-starter` — update the org/repo path
-> once you've created your own repository from this template. Replace the
-> License badge once you've picked a license (see `LICENSE`). Replace the
-> DOI badge with the real Zenodo badge after your first release (see
+> **Badge setup:** the CI badge is configured for
+> `jhu-sheridan-libraries/libraries-ai-starter`. Update the org/repo path
+> after creating a repository from this template. The License badge reflects
+> this template's [MIT License](./LICENSE). Replace the DOI badge with the
+> real Zenodo badge after the first release (see
 > [`docs/archiving-and-citability.md`](./docs/archiving-and-citability.md)).
 
 A GitHub template repository for AI projects built by JHU Sheridan Libraries
@@ -60,6 +60,27 @@ architecture.
    your specific project.
 5. Replace this README with a description of your actual project once
    setup is complete.
+
+## Available Kiro workflows
+
+After the organization publishes its starter workflows, find them under
+**Actions → New workflow → your organization**. Each requires a repository or
+organization secret named `KIRO_API_KEY`.
+
+- **Kiro AI Project Bootstrap** — scaffolds `.kiro/` context, baseline project
+  documentation, and bundled powers in a reviewable pull request.
+- **Kiro** — ask Kiro to implement work from a `/kiro <instruction>` comment,
+  a `kiro` label, an assignment, or a manual Actions-tab run.
+- **Kiro Docs Sync** — checks whether source-code changes need documentation
+  updates; it runs on matching pull requests or manually against a PR number.
+- **Kiro Dependency Audit** — runs weekly or on demand to identify dependency
+  updates; manual runs support a version-scope choice, a package filter, and a
+  report-only dry run.
+
+These workflows grant Kiro write access to create branches, update pull
+requests, or file issues as needed. Review every Kiro-generated pull request
+before merging it. See [TEMPLATE_SETUP.md](./TEMPLATE_SETUP.md) for bootstrap
+setup guidance.
 
 ## Repository layout
 
