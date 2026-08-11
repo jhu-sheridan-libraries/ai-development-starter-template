@@ -1,0 +1,11 @@
+[package]
+name = "example-pkg"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "libraries-ai-starter Rust reference example"
+publish = false
+
+[dependencies]
+
+[dev-dependencies]
