@@ -1,13 +1,12 @@
 name: Release template
 
-# Creates a published source release for the template itself. GitHub's Zenodo
-# integration archives the published release and mints a version DOI; it does
+# Creates a published, source-only GitHub release for this template itself.
+# It creates a versioned tag at the selected default-branch commit but does
 # not publish any of the independent language examples under examples/.
 #
-# Before dispatching, merge a release-preparation commit to the default branch
-# that updates CITATION.cff, .zenodo.json, and ro-crate-metadata.json for the
-# version being released. This workflow validates those committed records but
-# never changes them, keeping release metadata reviewable.
+# This workflow intentionally has no Zenodo integration or citation/archive
+# metadata checks. Those files are consumer-project placeholders: repositories
+# created from this template decide whether to enable Zenodo and mint a DOI.
 
 on:
   workflow_dispatch:
@@ -108,95 +107,6 @@ jobs:
           fi
           echo "Validated successful CI run ${successful_run_id} for ${TARGET_SHA}." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Validate release metadata
-        env:
-          VERSION: ${{ inputs.version }}
-        run: |
-          set -euo pipefail
-          python3 - <<'PYTHON'
-          import datetime
-          import json
-          import re
-          import sys
-          from pathlib import Path
-
-          version = __import__("os").environ["VERSION"]
-          expected_version = version.removeprefix("v")
-          errors: list[str] = []
-
-          cff_path = Path("CITATION.cff")
-          cff = cff_path.read_text(encoding="utf-8")
-          if "REPLACE-WITH-" in cff:
-              errors.append("CITATION.cff still contains a REPLACE-WITH placeholder")
-
-          def cff_value(field: str) -> str | None:
-              match = re.search(rf"^{re.escape(field)}:\s*[\"']?([^\"'\n]+)[\"']?\s*$", cff, re.MULTILINE)
-              return match.group(1).strip() if match else None
-
-          if cff_value("license") != "MIT":
-              errors.append("CITATION.cff license must be MIT")
-          if cff_value("version") != expected_version:
-              errors.append(f"CITATION.cff version must be {expected_version}")
-          release_date = cff_value("date-released")
-          try:
-              if release_date is None:
-                  raise ValueError("missing")
-              datetime.date.fromisoformat(release_date)
-          except ValueError:
-              errors.append("CITATION.cff date-released must be an ISO-8601 date")
-
-          def read_json(path: str) -> object:
-              try:
-                  return json.loads(Path(path).read_text(encoding="utf-8"))
-              except (OSError, json.JSONDecodeError) as exc:
-                  errors.append(f"{path} is not valid JSON: {exc}")
-                  return {}
-
-          zenodo = read_json(".zenodo.json")
-          ro_crate = read_json("ro-crate-metadata.json")
-
-          def strings(value: object):
-              if isinstance(value, str):
-                  yield value
-              elif isinstance(value, list):
-                  for item in value:
-                      yield from strings(item)
-              elif isinstance(value, dict):
-                  for item in value.values():
-                      yield from strings(item)
-
-          for path, metadata in ((".zenodo.json", zenodo), ("ro-crate-metadata.json", ro_crate)):
-              if any("REPLACE-WITH-" in value for value in strings(metadata)):
-                  errors.append(f"{path} still contains a REPLACE-WITH placeholder")
-
-          def license_values(value: object):
-              if isinstance(value, dict):
-                  for key, item in value.items():
-                      if key.lower() == "license" and isinstance(item, str):
-                          yield item
-                      yield from license_values(item)
-              elif isinstance(value, list):
-                  for item in value:
-                      yield from license_values(item)
-
-          accepted_licenses = {
-              "MIT",
-              "https://spdx.org/licenses/MIT",
-              "https://spdx.org/licenses/MIT.html",
-              "https://opensource.org/license/mit/",
-          }
-          for path, metadata in ((".zenodo.json", zenodo), ("ro-crate-metadata.json", ro_crate)):
-              values = list(license_values(metadata))
-              if not values or any(value not in accepted_licenses for value in values):
-                  errors.append(f"{path} license metadata must consistently identify the MIT License")
-
-          if errors:
-              print("::error::Release metadata preflight failed:", file=sys.stderr)
-              for error in errors:
-                  print(f"::error::{error}", file=sys.stderr)
-              raise SystemExit(1)
-          PYTHON
-
       - name: Verify tag and release do not already exist
         env:
           GH_TOKEN: ${{ github.token }}
@@ -236,7 +146,7 @@ jobs:
             echo "- Commit: \`${TARGET_SHA}\`"
             echo "- Release: ${release_url}"
             echo
-            echo "Zenodo will archive this published release asynchronously. After it mints"
-            echo "the DOI, follow docs/archiving-and-citability.md to update the citation"
-            echo "records and README DOI badge in a separate reviewed commit."
+            echo "This release versions the starter template only. It does not publish"
+            echo "or archive consumer projects; each project created from the template"
+            echo "decides whether to configure Zenodo and mint a DOI."
           } >> "$GITHUB_STEP_SUMMARY"

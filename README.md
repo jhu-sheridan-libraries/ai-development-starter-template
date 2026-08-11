@@ -2,15 +2,15 @@
 
 [![CI](https://github.com/jhu-sheridan-libraries/libraries-ai-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/jhu-sheridan-libraries/libraries-ai-starter/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![DOI](https://img.shields.io/badge/DOI-pending--first--release-lightgrey)](./docs/archiving-and-citability.md)
-[![Cite this repository](https://img.shields.io/badge/cite-CITATION.cff-blue)](./CITATION.cff)
 
 > **Badge setup:** the CI badge is configured for
 > `jhu-sheridan-libraries/libraries-ai-starter`. Update the org/repo path
 > after creating a repository from this template. The License badge reflects
-> this template's [MIT License](./LICENSE). Replace the DOI badge with the
-> real Zenodo badge after the first release (see
-> [`docs/archiving-and-citability.md`](./docs/archiving-and-citability.md)).
+> this template's [MIT License](./LICENSE). This starter template has no DOI
+> or citation badge: its citation and Zenodo files are placeholders for
+> consumer projects. See
+> [`docs/archiving-and-citability.md`](./docs/archiving-and-citability.md) to
+> configure those badges after a consumer project's first release.
 
 A GitHub template repository for AI projects built by JHU Sheridan Libraries
 and academic research computing teams. It provides a polyglot starting point
@@ -31,9 +31,9 @@ architecture.
   `CITATIONS.md`, `ACKNOWLEDGMENTS.md`, model/dataset cards, and an
   `AI_USAGE.md` provenance log.
 - **Archiving and citability**: `.zenodo.json` and `ro-crate-metadata.json`
-  alongside `CITATION.cff` so a GitHub release can be archived on Zenodo
-  with a real DOI, plus a `FUNDING.yml` placeholder for project
-  sponsorship. See
+  alongside `CITATION.cff` so a consumer project can archive its own GitHub
+  release on Zenodo with a real DOI, plus a `FUNDING.yml` placeholder for
+  project sponsorship. See
   [`docs/archiving-and-citability.md`](./docs/archiving-and-citability.md).
 - **AI-specific guidance**: responsible-AI expectations, prompt-injection
   awareness, and data-governance/IRB/PII notes for JHU research contexts.
