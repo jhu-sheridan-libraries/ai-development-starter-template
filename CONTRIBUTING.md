@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for contributing. This project was created from the
-`libraries-ai-starter` template; if `TEMPLATE_SETUP.md` still exists at the
+`ai-development-starter-template`; if `TEMPLATE_SETUP.md` still exists at the
 repository root, complete it first.
 
 ## Getting set up

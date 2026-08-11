@@ -1,6 +1,7 @@
 # Responsible AI guidance
 
-Expectations for any project built from `libraries-ai-starter` that uses
+Expectations for any project built from
+`ai-development-starter-template` that uses
 generative AI, machine learning models, or automated decision-making.
 
 ## Before you build

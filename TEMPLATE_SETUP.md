@@ -1,7 +1,8 @@
 # Template setup checklist
 
 Run through this once, right after creating a repository from
-`libraries-ai-starter`. Delete this file (or reduce it to a changelog entry)
+`ai-development-starter-template`. Delete this file (or reduce it to a
+changelog entry)
 once you've completed it.
 
 ## 1. Pick a language and promote an example
@@ -70,8 +71,13 @@ org's `.github` repository, see that workflow's own runbook
   for the full Zenodo DOI setup.
 - `.github/FUNDING.yml` — uncomment and fill in if this project accepts
   sponsorship/donations; otherwise delete it.
-- README badges — update the CI badge's org/repo path, the License badge,
-  and the DOI badge (once you have one from Zenodo).
+- README badges — replace every
+  `jhu-sheridan-libraries/ai-development-starter-template` path with your
+  own `org/repo`, drop the "Use this template" badge (it only applies to a
+  template repository), and add a DOI badge once Zenodo issues one. The
+  license badge reads `LICENSE` from your repository automatically, so it
+  updates itself if you change licenses. Confirm each badge renders instead
+  of 404ing before you publish.
 
 ## 5. Update project-identifying files
 
