@@ -13,7 +13,7 @@ authors:
     affiliation: "Johns Hopkins University, Sheridan Libraries"
     orcid: "https://orcid.org/0000-0000-0000-0000"
 repository-code: "https://github.com/jhu-sheridan-libraries/REPLACE-WITH-REPO-NAME"
-license: "Apache-2.0"
+license: "MIT"
 version: "0.1.0"
 date-released: "2026-08-10"
 keywords:
