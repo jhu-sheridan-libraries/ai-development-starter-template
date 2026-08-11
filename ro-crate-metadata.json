@@ -1,0 +1,38 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      "@id": "ro-crate-metadata.json",
+      "conformsTo": { "@id": "https://w3id.org/ro/crate/1.1" },
+      "about": { "@id": "./" }
+    },
+    {
+      "@id": "./",
+      "@type": "Dataset",
+      "name": "REPLACE-WITH-PROJECT-TITLE",
+      "description": "One or two sentences describing what this project does. Replace this placeholder before publishing.",
+      "datePublished": "2026-08-10",
+      "license": { "@id": "https://www.apache.org/licenses/LICENSE-2.0" },
+      "author": [{ "@id": "#REPLACE-WITH-AUTHOR-ORCID-OR-ID" }],
+      "publisher": { "@id": "https://ror.org/00za53h95" }
+    },
+    {
+      "@id": "#REPLACE-WITH-AUTHOR-ORCID-OR-ID",
+      "@type": "Person",
+      "name": "Lastname, Firstname",
+      "affiliation": { "@id": "https://ror.org/00za53h95" }
+    },
+    {
+      "@id": "https://ror.org/00za53h95",
+      "@type": "Organization",
+      "name": "Johns Hopkins University"
+    },
+    {
+      "@id": "https://www.apache.org/licenses/LICENSE-2.0",
+      "@type": "CreativeWork",
+      "name": "Apache License 2.0",
+      "description": "Placeholder license entry -- update to match whatever license you actually choose in LICENSE, and update the `license` reference on the Root Data Entity above to match."
+    }
+  ]
+}

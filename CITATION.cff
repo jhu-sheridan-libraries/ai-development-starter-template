@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the metadata below.
+  Update this file with your project's actual details before publishing.
+title: "REPLACE-WITH-PROJECT-TITLE"
+abstract: >-
+  One or two sentences describing what this project does. Replace this
+  placeholder before publishing.
+type: software
+authors:
+  - family-names: "Lastname"
+    given-names: "Firstname"
+    affiliation: "Johns Hopkins University, Sheridan Libraries"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+repository-code: "https://github.com/jhu-sheridan-libraries/REPLACE-WITH-REPO-NAME"
+license: "Apache-2.0"
+version: "0.1.0"
+date-released: "2026-08-10"
+keywords:
+  - artificial-intelligence
+  - research-computing
+  - johns-hopkins-university

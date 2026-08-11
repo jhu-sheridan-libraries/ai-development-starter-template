@@ -1,0 +1,28 @@
+{
+  "title": "REPLACE-WITH-PROJECT-TITLE",
+  "description": "One or two sentences describing what this project does. Replace this placeholder before publishing.",
+  "creators": [
+    {
+      "name": "Lastname, Firstname",
+      "affiliation": "Johns Hopkins University, Sheridan Libraries",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "license": "Apache-2.0",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": [
+    "artificial-intelligence",
+    "research-computing",
+    "johns-hopkins-university"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/jhu-sheridan-libraries/REPLACE-WITH-REPO-NAME",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "grants": [],
+  "communities": []
+}
