@@ -1,0 +1,56 @@
+# --- Editors / OS ---
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.kiro/settings*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+
+# --- Node / TypeScript ---
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.npm/
+.eslintcache
+
+# --- Rust ---
+target/
+Cargo.lock.bak
+
+# --- Research data & experiments ---
+# Data and experiment outputs are ignored by default: this repository is
+# not the place for raw data, model checkpoints, or run artifacts. See
+# data/README.md and experiments/README.md for the intended workflow
+# (git-lfs / DVC, external storage). .gitkeep files keep the directories
+# present in git without tracking their contents.
+data/*
+!data/.gitkeep
+!data/README.md
+experiments/*
+!experiments/.gitkeep
+!experiments/README.md
+notebooks/*.ipynb.bak
+
+# Jupyter checkpoints (raw notebooks are tracked, but keep outputs/checkpoints out)
+.ipynb_checkpoints/
